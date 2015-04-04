@@ -27,7 +27,9 @@ jQuery(function ($) {
         e.preventDefault();
         var anchor = $(this),
             time = anchor.text(),
-            email = anchor.closest('tr').find('.td-email').text(),
+            td = anchor.closest('tr').find('.td-email');
+        td.children().remove(); // Remove script tags
+        var email = td.text(),
             html = template_form.replace('{email}', email).replace('{sending_time}', time);
         anchor.hide();
         anchor.parent().append(html).find('[name="sending_time"]').datetimepicker(timepicker_options).focus();

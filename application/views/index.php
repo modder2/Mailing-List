@@ -87,8 +87,8 @@
                 <?php if ( ! empty($emails)):
                     foreach($emails as $email): ?>
                 <tr>
-                    <td class="td-email"><?php echo $email['email']; ?></td>
-                    <td class="text-center td-time"><a href="#edittime" title="Edit sending time"><?php echo $email['sending_time']; ?></a></td>
+                    <td class="td-email"><?php echo HTML::protect_email($email['email']); ?></td>
+                    <td class="text-center td-time"><a href="#" title="Edit sending time"><?php echo $email['sending_time']; ?></a></td>
                     <?php switch($email['last_status'])
                     {
                         case 'wait':
