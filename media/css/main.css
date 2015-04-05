@@ -40,6 +40,9 @@ body {
         margin-bottom: 0;
     }
 }
+.large {
+    font-size: 115%;
+}
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,

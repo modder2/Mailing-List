@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `emails` (
   `email` varchar(255) NOT NULL,
   `sending_time` int(10) unsigned NOT NULL,
   `last_status` enum('wait','sent','error') NOT NULL DEFAULT 'wait',
+  `unsubscribe_hash` char(10) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;

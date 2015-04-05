@@ -22,7 +22,8 @@ Uses a number of open source projects to work properly:
 2. Make sure the `application/cache` and `application/logs` directories are writable by the web server.
 3. Create MySQL database and import dump file `mailing.sql`.
 4. Configure connection to the database in `application/config/database.php`.
-5. Create crontab task for run mail distribution every 10 minutes (or someone else):
+5. Set absolute site base URL in `application/bootstrap.php` on line 90.
+6. Create crontab task for run mail distribution every 10 minutes (or someone else):
 ```
 */10 * * * * php /path/to/document/root/index.php --uri=distribution/run
 ```

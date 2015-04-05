@@ -21,6 +21,11 @@ class Model_Email extends ORM {
         return ! self::exist_email($email);
     }
 
+    public static function check_email_hash($email, $hash)
+    {
+        return (bool) ORM::factory('email', array('email' => $email, 'unsubscribe_hash' => $hash))->loaded();
+    }
+
     public function get_emails()
     {
         $emails = DB::select()
@@ -52,12 +57,37 @@ class Model_Email extends ORM {
         return TRUE;
     }
 
-    public function update_email_time(array $data)
+    public function update_email_time($email, $sending_time)
     {
-        $data['sending_time'] = strtotime($data['sending_time']);
+        $sending_time = strtotime($sending_time);
 
-        ORM::factory('email', array('email' => $data['email']))
-            ->set('sending_time', $data['sending_time'])
+        ORM::factory('email', array('email' => $email))
+            ->set('sending_time', $sending_time)
+            ->update();
+
+        return TRUE;
+    }
+
+    public function update_status($email_id, $status)
+    {
+        ORM::factory('email', $email_id)
+            ->set('last_status', $status)
+            ->update();
+
+        return TRUE;
+    }
+
+    /**
+     * Update unsubscribe hash in DB
+     *
+     * @param  string  email address
+     * @param  string  unsubscribe hash
+     * @return bool
+     */
+    public function update_hash($email, $hash)
+    {
+        ORM::factory('email', array('email' => $email))
+            ->set('unsubscribe_hash', $hash)
             ->update();
 
         return TRUE;
@@ -76,6 +106,13 @@ class Model_Email extends ORM {
     {
         $config = Kohana::$config->load('config');
         $message = str_replace('{current_date}', date($config['date_format']), $config['mail']['message']);
+        $hash = strtolower(Text::random('alnum', 10));
+        $this->update_hash($email, $hash);
+        $unsubscribe_url = Route::url('unsubscribe', array(
+            'email' => rawurlencode($email),
+            'hash' => $hash,
+        ));
+        $message = str_replace('{unsubscribe_url}', $unsubscribe_url, $message);
         $sent_cnt = Email::factory($config['mail']['subject'], $message, 'text/html', $config['mail']['config_name']) //($subject, $body, 'text/html', $config_name)
             ->to($email)
             ->send();
@@ -83,12 +120,9 @@ class Model_Email extends ORM {
         return (bool) $sent_cnt;
     }
 
-    public function update_status($email_id, $status)
+    public function delete_email($email)
     {
-        ORM::factory('email', $email_id)
-            ->set('last_status', $status)
-            ->update();
-
+        ORM::factory('email', array('email' => $email))->delete();
         return TRUE;
     }
 

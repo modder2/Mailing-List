@@ -12,6 +12,8 @@ class Controller_Email extends Controller_Template {
      */
     public $template = 'index';
 
+    protected $template_params = array();
+
     public function before()
     {
         parent::before();
@@ -30,9 +32,11 @@ class Controller_Email extends Controller_Template {
     public function action_index()
     {
         // Get all emails
-        $this->template->emails = Model::factory('email')->get_emails();
+        $this->template_params['emails'] = Model::factory('email')->get_emails();
         // Get counters
-        $this->template->counters = Model::factory('counter')->get_counters();
+        $this->template_params['counters'] = Model::factory('counter')->get_counters();
+
+        $this->template->content = View::factory('emails')->set($this->template_params);
     }
 
     /**
@@ -50,8 +54,8 @@ class Controller_Email extends Controller_Template {
             ->rule('sending_time', 'date');
         if ( ! $validation->check())
         {
-            $this->template->errors = $validation->errors('validation');
-            $this->template->post_data = $data;
+            $this->template_params['errors'] = $validation->errors('validation');
+            $this->template_params['post_data'] = $data;
             return FALSE;
         }
 
@@ -76,14 +80,48 @@ class Controller_Email extends Controller_Template {
             ->rule('sending_time', 'date');
         if ( ! $validation->check())
         {
-            $this->template->errors = $validation->errors('validation');
+            $this->template_params['errors'] = $validation->errors('validation');
             return FALSE;
         }
 
-        if (Model::factory('email')->update_email_time($data))
+        if (Model::factory('email')->update_email_time($data['email'], $data['sending_time']))
         {
             $this->request->redirect($this->request->uri());
         }
+    }
+
+    /**
+     * Delete email from mailing list
+     */
+    public function action_unsubscribe()
+    {
+        $email = $this->request->param('email');
+        $this->template_params = $this->request->param();
+        $validation = Validation::factory($this->template_params)
+            ->rule('email', 'not_empty')
+            ->rule('email', 'email')
+            ->rule('email', 'Model_Email::exist_email')
+            ->rule('hash', 'not_empty')
+            ->rule('hash', 'alpha_numeric');
+        if ( ! $validation->check())
+        {
+            $this->template_params['errors'] = $validation->errors('validation');
+        }
+        else
+        {
+            $validation = Validation::factory($this->template_params)
+                ->rule('hash', 'Model_Email::check_email_hash', array($email, ':value'));
+            if ( ! $validation->check())
+            {
+                $this->template_params['errors'] = $validation->errors('validation');
+            }
+            else
+            {
+                Model::factory('email')->delete_email($email);
+            }
+        }
+
+        $this->template->content = View::factory('unsubscribe')->set($this->template_params);
     }
 
     /**
