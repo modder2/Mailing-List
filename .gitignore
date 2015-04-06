@@ -1,9 +1,3 @@
-# ignore all files in logs directory
-application/logs/
-
-# ignore all files in cache
-application/cache/
-
 # PhpStorm settings
 .idea/
 
