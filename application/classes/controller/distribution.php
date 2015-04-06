@@ -12,7 +12,8 @@ class Controller_Distribution extends Controller {
 
         if ( ! Kohana::$is_cli)
         {
-            throw new HTTP_Exception_404('Page not found');
+            throw new HTTP_Exception_404('The requested URL :uri was not found on this server.',
+                array(':uri' => $this->request->uri()));
         }
     }
 

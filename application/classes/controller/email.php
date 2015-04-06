@@ -6,12 +6,6 @@
  */
 class Controller_Email extends Controller_Template {
 
-    /**
-     * View template name
-     * @var string
-     */
-    public $template = 'index';
-
     protected $template_params = array();
 
     public function before()
@@ -129,21 +123,20 @@ class Controller_Email extends Controller_Template {
      */
     public function after()
     {
-        if ($this->auto_render)
+        if ($this->auto_render === TRUE)
         {
-            $this->template->styles  = array(
-                'bootstrap.min.css',
-                'bootstrap-theme.min.css',
+            $styles  = array(
                 'bootstrap-datetimepicker.min.css',
-                'main.css',
             );
-            $this->template->scripts = array(
+            $scripts = array(
                 'jquery-1.11.2.min.js',
                 'moment.min.js',
                 'bootstrap.min.js',
                 'bootstrap-datetimepicker.min.js',
                 'main.js',
             );
+            $this->template->styles  = array_merge($styles, $this->template->styles);
+            $this->template->scripts = array_merge($scripts, $this->template->scripts);
         }
 
         parent::after();

@@ -32,7 +32,7 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <p class="navbar-text">is a simple mail distribution</p>
-                <?php if (Route::name(Request::initial()->route()) === 'default'): ?>
+                <?php if (Route::name(Request::current()->route()) === 'default'): ?>
                 <form action="" method="get" class="navbar-form navbar-right">
                     <button type="submit" class="btn btn-success">Refresh</button>
                 </form>
